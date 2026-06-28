@@ -23,19 +23,15 @@ if NON_INTERACTIVE:
     rich.prompt.Confirm.ask = _mock_confirm
 
 from rich.console import Console
-from rich.panel import Panel
 from rich.table import Table
 from rich import box
 from rich.prompt import Prompt
-from rich.text import Text
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from modules.utils import clear_screen, check_dependencies, get_device_info
+from modules.utils import clear_screen
+from modules.wifi_scan import WifiScan
 from modules.bruteforce import BruteForce
-from modules.ir_remote import IrRemote
-from modules.network_remote import NetworkRemote
-from modules.system_tools import SystemTools
 
 console = Console()
 
@@ -43,11 +39,8 @@ APP_NAME = "[bold cyan]FLIPPER-Z[/bold cyan] [white]ANDROID[/white]"
 VERSION = "2.0.0"
 
 MENU_ITEMS = [
-    {"icon": "⚡", "name": "Brute Force", "desc": "Hash, ZIP, PDF, wordlist, PIN analyzer — real tools", "color": "red"},
-    {"icon": "📺", "name": "IR Remote", "desc": "TV IR codes (Samsung, LG, Sony, Panasonic, Xiaomi, TCL)", "color": "yellow"},
-    {"icon": "🌐", "name": "Network Remote", "desc": "Control Smart TV via WiFi (real HTTP)", "color": "cyan"},
-    {"icon": "🛠️", "name": "System Tools", "desc": "Nmap, Hydra, John, SQLMap, GoBuster, FFUF...", "color": "magenta"},
-    {"icon": "ℹ️", "name": "Device Info", "desc": "Show phone hardware capabilities", "color": "white"},
+    {"icon": "📶", "name": "WiFi Scan", "desc": "Scan reti WiFi vicine (termux-api reale)", "color": "green"},
+    {"icon": "⚡", "name": "Brute Force", "desc": "Hash cracker, ZIP, PDF, wordlist, PIN, rainbow — reali", "color": "red"},
     {"icon": "🚪", "name": "Exit", "desc": "Exit Flipper-Z", "color": "red"},
 ]
 
@@ -83,42 +76,14 @@ def show_menu():
     console.print()
 
 
+def handle_wifi_scan():
+    ws = WifiScan(console)
+    ws.menu()
+
+
 def handle_bruteforce():
     bf = BruteForce(console)
     bf.menu()
-
-
-def handle_ir():
-    ir = IrRemote(console)
-    ir.menu()
-
-
-def handle_network_remote():
-    nr = NetworkRemote(console)
-    nr.menu()
-
-
-def handle_system_tools():
-    st = SystemTools(console)
-    st.menu()
-
-
-def handle_device_info():
-    clear_screen()
-    show_banner()
-    info = get_device_info()
-    table = Table(title="[bold cyan]Device Hardware Info[/bold cyan]", box=box.ROUNDED, border_style="cyan")
-    table.add_column("Feature", style="bold yellow")
-    table.add_column("Status", style="bold")
-    table.add_column("Details", style="white")
-
-    for feat, status, details in info:
-        status_style = "green" if status == "Available" else "red" if status == "Unavailable" else "yellow"
-        table.add_row(feat, f"[{status_style}]{status}[/{status_style}]", details)
-
-    console.print(table)
-    console.print("\n[dim]Note: Some features require root or specific hardware[/dim]")
-    Prompt.ask("[bold yellow]Press Enter to return[/bold yellow]")
 
 
 def main():
@@ -131,7 +96,7 @@ def main():
             else:
                 show_menu()
                 try:
-                    choice = Prompt.ask("[bold yellow]Select option[/bold yellow]", default="11")
+                    choice = Prompt.ask("[bold yellow]Select option[/bold yellow]", default="3")
                     choice = int(choice)
                 except (ValueError, TypeError):
                     console.print("[red]Invalid selection. Enter a number.[/red]")
@@ -147,11 +112,8 @@ def main():
                 sys.exit(0)
 
             handlers = {
-                1: handle_bruteforce,
-                2: handle_ir,
-                3: handle_network_remote,
-                4: handle_system_tools,
-                5: handle_device_info,
+                1: handle_wifi_scan,
+                2: handle_bruteforce,
             }
 
             handlers[choice]()
