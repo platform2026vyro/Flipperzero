@@ -1,87 +1,66 @@
 # Flipper-Z Android
 
-Suite completa di strumenti hacking per Android. Ispirata a Flipper Zero.
+Suite strumenti hacking per Android — **solo tool reali, niente simulazioni**.
 
-## Installazione rapida
+## Installazione completa (Termux)
 
-### Su Termux (Android)
+Copia e incolla tutto:
+
 ```bash
-pkg update && pkg upgrade -y
-pkg install python rich requests termux-api curl -y
-pip install rich requests
-git clone https://github.com/platform2026vyro/Flipperzero.git
-cd Flipperzero
-python main.py
+pkg update && pkg upgrade -y && pkg install -y python python-pip git curl termux-api blesh bluez nmap hydra john sqlmap gobuster ffuf dirb wfuzz whatweb nikto whois dnsutils && pip install --break-system-packages rich requests bleak pikepdf && git clone https://github.com/platform2026vyro/Flipperzero.git && cd Flipperzero && python main.py
 ```
 
-### Su Linux (PC / Ubuntu)
-```bash
-apt update && apt install python3 python3-pip curl -y
-pip3 install rich requests
-git clone https://github.com/platform2026vyro/Flipperzero.git
-cd Flipperzero
-python3 main.py
-```
-
-### Download diretto (senza git)
-```bash
-curl -sL https://paste.rs/BkOWZ -o flipperz.tar.gz && tar xzf flipperz.tar.gz && cd flipperz-android && python3 main.py
-```
+Se qualche pacchetto non si installa, niente panico — il tool funziona lo stesso, solo quel modulo non sarà disponibile.
 
 ## Moduli
 
-| # | Modulo | Descrizione |
-|---|--------|-------------|
-| 1 | NFC Tools | Legge, scrive, clona tag NFC |
-| 2 | BLE Scanner | Scansiona dispositivi Bluetooth LE |
-| 3 | WiFi Tools | Scan, deauth, handshake capture |
-| 4 | **Brute Force** ⚡ | 15 tool: hash, ZIP, PDF, wordlist, PIN, password analyzer, rainbow table |
-| 5 | Sub-GHz | RF signal simulation |
-| 6 | BadUSB | HID attack scripts |
-| 7 | IR Remote | Codici TV: Samsung, LG, Sony, Panasonic, Xiaomi, TCL |
-| 8 | Network Remote | Controllo Smart TV via WiFi |
-| 9 | **System Tools** 🛠️ | Nmap, Hydra, John, SQLMap, GoBuster, FFUF, Dirb, WFuzz, WhatWeb, Nikto, Dig |
-| 10 | Device Info | Info hardware telefono |
+| # | Modulo | Dipende da | Realtà |
+|---|--------|-----------|--------|
+| 1 | 📡 **NFC Tools** | `termux-nfc` (termux-api) | ✅ Reale |
+| 2 | 🔵 **BLE Scanner** | `termux-bluetooth-scan` (termux-api) | ✅ Reale |
+| 3 | 📶 **WiFi Scan** | `termux-wifi-scaninfo` (termux-api) + ping | ✅ Reale |
+| 4 | ⚡ **Brute Force** | Python built-in + pikepdf | ✅ Reale |
+| 5 | 🛴 **Scooter Unlock** | `blesh` / `bleak` / `gatttool` | ✅ Reale |
+| 6 | 📺 **IR Remote** | Solo codici (serve IR blaster) | ✅ Codici |
+| 7 | 🌐 **Network Remote** | HTTP requests (Python) | ✅ Reale |
+| 8 | 🛠️ **System Tools** | nmap, hydra, john, sqlmap, gobuster, ffuf, dirb, whatweb, nikto | ✅ Reali |
+| 9 | ℹ️ **Device Info** | `termux-battery-status`, `termux-sensor`, `termux-telephony-deviceinfo` | ✅ Reale |
 
-## Tool reali verificati
+## Dipendenze complete
 
-✅ **System Tools** — Nmap, SQLMap, GoBuster, FFUF, Hydra, John, Dirb, WhatWeb, Nikto, Dig  
-✅ **Brute Force** — hash cracker, ZIP crack, PDF crack, wordlist gen, PIN gen, password analyzer, rainbow table  
-✅ **Network Remote** — controllo Smart TV via WiFi  
-✅ **WiFi Scan** — scansione reti (da Termux o Android API)  
-✅ **Dig** — query DNS reali  
+| Tool | Modulo | Comando installazione |
+|------|--------|----------------------|
+| termux-api | NFC, BLE, WiFi, Device | `pkg install termux-api` |
+| blesh | Scooter Unlock | `pkg install blesh` |
+| bluez (gatttool) | Scooter Unlock | `pkg install bluez` |
+| bleak (Python) | Scooter Unlock | `pip install bleak` |
+| pikepdf (Python) | PDF cracker | `pip install pikepdf` |
+| nmap | System Tools | `pkg install nmap` |
+| hydra | System Tools | `pkg install hydra` |
+| john | System Tools | `pkg install john` |
+| sqlmap | System Tools | `pkg install sqlmap` |
+| gobuster | System Tools | `pkg install gobuster` |
+| ffuf | System Tools | `pkg install ffuf` |
+| dirb | System Tools | `pkg install dirb` |
+| whatweb | System Tools | `pkg install whatweb` |
+| nikto | System Tools | `pkg install nikto` |
 
-## Tool che richiedono hardware
-
-⚠️ WiFi cracking (handshake) — richiede monitor mode, non disponibile su Samsung One UI 8  
-⚠️ NFC / BLE — richiedono Termux + termux-api  
-⚠️ Sub-GHz — richiede radio  
-⚠️ BadUSB — richiede OTG HID  
-⚠️ IR Remote — codici presenti, serve IR blaster per trasmettere  
-
-## Sistema operativo supportati
-
-- **Android** (Termux) — parziale (WiFi/NFC/BLE con termux-api)
-- **Linux** (PC / proot-distro) — completo per tool software
-- **Non compatibile**: Windows, macOS (serve Python manuale)
-
-## Esempi d'uso
+## Esecuzione
 
 ```bash
-# Avvio menu
+cd ~/Flipperzero
 python main.py
-
-# System Tools direttamente
-nmap -sV scanme.nmap.org
-sqlmap -u http://testphp.vulnweb.com/listproducts.php?cat=1
-gobuster dir -u https://example.com -w /usr/share/wordlists/dirb/common.txt
 ```
 
-## Note importanti
+Oppure direttamente un modulo:
+```bash
+python main.py 4   # Brute Force
+python main.py 5   # Scooter Unlock
+python main.py 8   # System Tools
+```
 
-- WiFi cracking richiede scheda con monitor mode (PC Linux con aircrack-ng)
-- Samsung S26 Ultra (One UI 8) non supporta sblocco bootloader → niente root
-- I tool sono solo per test autorizzati su propri server
+## Note
 
-## Repository originali
-- GitHub: [https://github.com/platform2026vyro/Flipperzero](https://github.com/platform2026vyro/Flipperzero)
+- NFC/BLE/WiFi richiedono **permessi Android** (vai su Impostazioni → App → Termux → Permessi)
+- Lo sblocco monopattino funziona con Xiaomi/Ninebot via BLE (tieni acceso il monopattino in pairing mode)
+- Tutti i tool sono reali: niente progress bar fake, niente simulazioni
