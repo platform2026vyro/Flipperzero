@@ -10,26 +10,32 @@ echo "║   ALL dependencies — One command     ║"
 echo "╚══════════════════════════════════════╝"
 echo -e "${NC}"
 
-echo -e "${YELLOW}[1/5] Updating Termux...${NC}"
+echo -e "${YELLOW}[1/5] Updating Termux & repos...${NC}"
 pkg update -y && pkg upgrade -y
+pkg install -y root-repo x11-repo 2>/dev/null || true
 
 echo -e "${YELLOW}[2/5] Core dependencies...${NC}"
 pkg install -y python python-pip git curl which
 
 echo -e "${YELLOW}[3/5] Python packages...${NC}"
 pip install --break-system-packages rich requests bleak pikepdf 2>/dev/null || \
-pip install rich requests bleak pikepdf 2>/dev/null || \
-echo -e "${YELLOW}Installa manuale: pip install rich requests bleak pikepdf${NC}"
+pip install rich requests bleak pikepdf 2>/dev/null || true
 
-echo -e "${YELLOW}[4/5] All hardware/system tools...${NC}"
-# NFC, BLE, WiFi, Device Info
-pkg install -y termux-api || echo "termux-api: ❌"
-# BLE scooter unlock
-pkg install -y blesh       || echo "blesh: ❌ (prova: pkg install blesh)"
-pkg install -y bluez       || echo "bluez: ❌ (prova: pkg install bluez)"
-# System Tools (reali)
-pkg install -y nmap hydra john sqlmap gobuster ffuf dirb wfuzz whatweb nikto whois dnsutils openssh traceroute || \
-echo -e "${YELLOW}Alcuni tool non disponibili, installa manualmente: pkg install nmap hydra john sqlmap gobuster ffuf dirb wfuzz whatweb nikto whois dnsutils${NC}"
+# blesh via pip (non disponibile su termux come pacchetto)
+pip install --break-system-packages blesh 2>/dev/null || \
+pip install blesh 2>/dev/null || echo -e "${YELLOW}⚠ blesh non installato (BLE scooter potrebbe non funzionare)${NC}"
+
+echo -e "${YELLOW}[4/5] Tool hardware & system...${NC}"
+# termux-api per NFC, BLE scan, WiFi scan, device info
+pkg install -y termux-api || true
+
+# System Tools (alcuni in root-repo/x11-repo)
+for pkg in nmap hydra john sqlmap gobuster ffuf dirb whatweb nikto whois dnsutils traceroute; do
+  pkg install -y "$pkg" 2>/dev/null && echo -e "  ✅ $pkg" || echo -e "  ❌ $pkg"
+done
+
+# wfuzz via pip
+pip install --break-system-packages wfuzz 2>/dev/null || pip install wfuzz 2>/dev/null || true
 
 echo -e "${YELLOW}[5/5] Data directories...${NC}"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -45,21 +51,10 @@ echo ""
 echo -e "${CYAN}Per avviare:${NC}"
 echo -e "  ${GREEN}cd ~/Flipperzero && python main.py${NC}"
 echo ""
-echo -e "${CYAN}Tool installati:${NC}"
-echo "  📡 NFC        → termux-nfc"
-echo "  🔵 BLE        → termux-bluetooth-scan + blesh + bleak"
-echo "  📶 WiFi       → termux-wifi-scaninfo"
-echo "  ⚡ Brute Force → hashlib + zipfile + pikepdf"
-echo "  🛴 Scooter    → blesh + bleak + gatttool"
-echo "  🛠️ System     → nmap hydra john sqlmap gobuster ffuf dirb whatweb nikto"
-echo "  ℹ️ Device     → termux-battery-status + termux-sensor + termux-telephony-deviceinfo"
-echo ""
-
-# Verify
-echo -e "${YELLOW}=== Verifica installazione ===${NC}"
-for cmd in termux-wifi-scaninfo termux-bluetooth-scan termux-battery-status termux-nfc nmap hydra sqlmap gobuster whatweb dig whois; do
+echo -e "${YELLOW}=== Riepilogo tool installati ===${NC}"
+for cmd in termux-wifi-scaninfo termux-bluetooth-scan termux-nfc termux-battery-status nmap hydra john sqlmap gobuster ffuf dirb whatweb nikto dig whois blesh; do
   if command -v "$cmd" &>/dev/null; then echo -e "  ✅ $cmd"; else echo -e "  ❌ $cmd"; fi
 done
-for pkg in rich requests bleak pikepdf; do
+for pkg in rich requests bleak pikepdf wfuzz; do
   if python -c "import $pkg" 2>/dev/null; then echo -e "  ✅ $pkg (Python)"; else echo -e "  ❌ $pkg (Python)"; fi
 done

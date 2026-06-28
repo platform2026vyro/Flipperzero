@@ -7,7 +7,7 @@ Suite strumenti hacking per Android — **solo tool reali, niente simulazioni**.
 Copia e incolla tutto:
 
 ```bash
-pkg update && pkg upgrade -y && pkg install -y python python-pip git curl termux-api blesh bluez nmap hydra john sqlmap gobuster ffuf dirb wfuzz whatweb nikto whois dnsutils && pip install --break-system-packages rich requests bleak pikepdf && git clone https://github.com/platform2026vyro/Flipperzero.git && cd Flipperzero && python main.py
+pkg update && pkg upgrade -y && pkg install -y root-repo x11-repo && pkg install -y python python-pip git curl termux-api nmap hydra john sqlmap gobuster ffuf dirb whatweb nikto whois dnsutils && pip install --break-system-packages rich requests bleak pikepdf wfuzz && git clone https://github.com/platform2026vyro/Flipperzero.git && cd Flipperzero && python main.py
 ```
 
 Se qualche pacchetto non si installa, niente panico — il tool funziona lo stesso, solo quel modulo non sarà disponibile.
