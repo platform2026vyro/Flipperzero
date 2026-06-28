@@ -7,18 +7,12 @@ Flipper Zero-like tool suite for Android Termux
 import sys
 import os
 
-# auto non-interactive when any arg is passed
 NON_INTERACTIVE = len(sys.argv) > 1
 
 if NON_INTERACTIVE:
     import rich.prompt
-
-    def _mock_ask(prompt="", default="", *a, **kw):
-        return default
-
-    def _mock_confirm(prompt="", default=True, *a, **kw):
-        return default
-
+    def _mock_ask(prompt="", default="", *a, **kw): return default
+    def _mock_confirm(prompt="", default=True, *a, **kw): return default
     rich.prompt.Prompt.ask = _mock_ask
     rich.prompt.Confirm.ask = _mock_confirm
 
@@ -30,8 +24,15 @@ from rich.prompt import Prompt
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from modules.utils import clear_screen
+from modules.nfc_tools import NfcTools
+from modules.ble_tools import BleScanner
 from modules.wifi_scan import WifiScan
 from modules.bruteforce import BruteForce
+from modules.scooter_unlock import ScooterUnlock
+from modules.ir_remote import IrRemote
+from modules.network_remote import NetworkRemote
+from modules.system_tools import SystemTools
+from modules.device_info import DeviceInfo
 
 console = Console()
 
@@ -39,9 +40,16 @@ APP_NAME = "[bold cyan]FLIPPER-Z[/bold cyan] [white]ANDROID[/white]"
 VERSION = "2.0.0"
 
 MENU_ITEMS = [
-    {"icon": "📶", "name": "WiFi Scan", "desc": "Scan reti WiFi vicine (termux-api reale)", "color": "green"},
-    {"icon": "⚡", "name": "Brute Force", "desc": "Hash cracker, ZIP, PDF, wordlist, PIN, rainbow — reali", "color": "red"},
-    {"icon": "🚪", "name": "Exit", "desc": "Exit Flipper-Z", "color": "red"},
+    {"icon": "📡", "name": "NFC Tools",       "desc": "Read NFC tags (via termux-nfc)",                "color": "blue"},
+    {"icon": "🔵", "name": "BLE Scanner",     "desc": "Scan BLE devices (via termux-bluetooth-scan)",  "color": "cyan"},
+    {"icon": "📶", "name": "WiFi Scan",       "desc": "Scan WiFi & ping sweep",                        "color": "green"},
+    {"icon": "⚡",  "name": "Brute Force",    "desc": "Hash, ZIP, PDF cracker, wordlist, PIN, rainbow","color": "red"},
+    {"icon": "🛴", "name": "Scooter Unlock",  "desc": "BLE scooter unlock (Xiaomi/Ninebot)",           "color": "yellow"},
+    {"icon": "📺", "name": "IR Remote",       "desc": "TV remote codes (Samsung, LG, Sony, Xiaomi)",   "color": "yellow"},
+    {"icon": "🌐", "name": "Network Remote",  "desc": "Control TVs via WiFi (HTTP API)",               "color": "cyan"},
+    {"icon": "🛠️", "name": "System Tools",   "desc": "Nmap, Hydra, SQLMap, GoBuster, FFUF, John...",  "color": "magenta"},
+    {"icon": "📱", "name": "Device Info",     "desc": "Battery, sensors, telephony info",              "color": "green"},
+    {"icon": "🚪", "name": "Exit",            "desc": "Exit Flipper-Z",                                "color": "red"},
 ]
 
 
@@ -64,8 +72,8 @@ def show_menu():
 
     table = Table(box=box.ROUNDED, border_style="cyan", show_header=False, padding=(1, 2))
     table.add_column("Option", style="bold yellow", width=4)
-    table.add_column("Tool", width=20)
-    table.add_column("Description", style="white", width=40)
+    table.add_column("Tool", width=22)
+    table.add_column("Description", style="white", width=42)
 
     for i, item in enumerate(MENU_ITEMS, 1):
         color = item["color"]
@@ -74,16 +82,6 @@ def show_menu():
 
     console.print(table)
     console.print()
-
-
-def handle_wifi_scan():
-    ws = WifiScan(console)
-    ws.menu()
-
-
-def handle_bruteforce():
-    bf = BruteForce(console)
-    bf.menu()
 
 
 def main():
@@ -96,7 +94,7 @@ def main():
             else:
                 show_menu()
                 try:
-                    choice = Prompt.ask("[bold yellow]Select option[/bold yellow]", default="3")
+                    choice = Prompt.ask("[bold yellow]Select option[/bold yellow]", default="10")
                     choice = int(choice)
                 except (ValueError, TypeError):
                     console.print("[red]Invalid selection. Enter a number.[/red]")
@@ -112,8 +110,15 @@ def main():
                 sys.exit(0)
 
             handlers = {
-                1: handle_wifi_scan,
-                2: handle_bruteforce,
+                1: lambda: NfcTools(console).menu(),
+                2: lambda: BleScanner(console).menu(),
+                3: lambda: WifiScan(console).menu(),
+                4: lambda: BruteForce(console).menu(),
+                5: lambda: ScooterUnlock(console).menu(),
+                6: lambda: IrRemote(console).menu(),
+                7: lambda: NetworkRemote(console).menu(),
+                8: lambda: SystemTools(console).menu(),
+                9: lambda: DeviceInfo(console).menu(),
             }
 
             handlers[choice]()
