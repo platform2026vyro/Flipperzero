@@ -1,0 +1,12 @@
+password
+12345678
+admin
+123456789
+wifi
+password123
+guest
+qwerty123
+letmein
+welcome
+monkey
+dragon
