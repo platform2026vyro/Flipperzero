@@ -71,22 +71,35 @@ class ScooterUnlock:
         clear_screen()
         self._banner()
         self.console.print("[yellow]Scanning BLE for scooters...[/yellow]")
-        try:
-            result = subprocess.run(
-                ["termux-bluetooth-scan"], capture_output=True, text=True, timeout=15
-            )
-        except FileNotFoundError:
-            self.console.print("[red]termux-bluetooth-scan not found. Install: pkg install termux-api[/red]")
+        devices = []
+        # Try multiple BLE scan methods
+        scan_methods = [
+            ("termux-bluetooth-scan", lambda: json.loads(
+                subprocess.run(["termux-bluetooth-scan"], capture_output=True, text=True, timeout=15).stdout or "[]"
+            )),
+            ("blesh scan", lambda: self._parse_blesh_scan(
+                subprocess.run(["blesh", "scan"], capture_output=True, text=True, timeout=15).stdout
+            )),
+            ("hcitool lescan", lambda: self._parse_hcitool_scan(
+                subprocess.run(["hcitool", "lescan", "--duplicates"], capture_output=True, text=True, timeout=10).stderr
+            )),
+        ]
+        for name, fn in scan_methods:
+            if shutil.which(name.split()[0]):
+                try:
+                    devices = fn()
+                    if devices:
+                        break
+                except Exception:
+                    continue
+        if not devices:
+            self.console.print("[red]No BLE scan tool available. Install one:[/red]")
+            self.console.print("  [yellow]pkg install termux-api[/yellow]   (for termux-bluetooth-scan)")
+            self.console.print("  [yellow]pkg install blesh[/yellow]        (for blesh)")
+            self.console.print("  [yellow]pkg install hcitool[/yellow]      (for hcitool)")
+            self.console.print("  [yellow]pip install bleak[/yellow]        (for Python bleak)")
             Prompt.ask("[bold yellow]Press Enter[/bold yellow]")
             return
-        except subprocess.TimeoutExpired:
-            self.console.print("[red]Scan timed out[/red]")
-            Prompt.ask("[bold yellow]Press Enter[/bold yellow]")
-            return
-        try:
-            devices = json.loads(result.stdout) if result.stdout else []
-        except json.JSONDecodeError:
-            devices = []
         scooter_list = []
         for d in devices:
             name = (d.get("name") or "").lower()
@@ -109,8 +122,28 @@ class ScooterUnlock:
             table.add_column("RSSI")
             for i, s in enumerate(scooter_list, 1):
                 table.add_row(str(i), s.get("name", "?"), s.get("address", s.get("mac", "?")), str(s.get("rssi", "?")))
-            self.console.print(table)
+        self.console.print(table)
         Prompt.ask("[bold yellow]Press Enter[/bold yellow]")
+
+    def _parse_blesh_scan(self, output):
+        devices = []
+        for line in output.split("\n"):
+            parts = line.strip().split()
+            if len(parts) >= 2 and ":" in parts[0]:
+                devices.append({"name": parts[1] if len(parts) > 1 else "?", "address": parts[0], "rssi": "?"})
+        return devices
+
+    def _parse_hcitool_scan(self, output):
+        devices = []
+        for line in output.split("\n"):
+            if ":" in line and len(line) > 20:
+                parts = line.strip().split()
+                if len(parts) >= 2:
+                    mac = parts[0] if ":" in parts[0] else ""
+                    name = " ".join(parts[1:]) if len(parts) > 1 else "?"
+                    if mac:
+                        devices.append({"name": name, "address": mac, "rssi": "?"})
+        return devices
 
     def _blesh_write(self, mac, service_uuid, char_uuid, hex_data):
         """Write to BLE characteristic via blesh CLI"""
@@ -251,3 +284,23 @@ class ScooterUnlock:
             table.add_row(tool, status, install)
         self.console.print(table)
         Prompt.ask("[bold yellow]Press Enter[/bold yellow]")
+
+    def _parse_blesh_scan(self, output):
+        devices = []
+        for line in output.split("\n"):
+            parts = line.strip().split()
+            if len(parts) >= 2 and ":" in parts[0]:
+                devices.append({"name": parts[1] if len(parts) > 1 else "?", "address": parts[0], "rssi": "?"})
+        return devices
+
+    def _parse_hcitool_scan(self, output):
+        devices = []
+        for line in output.split("\n"):
+            if ":" in line and len(line) > 20:
+                parts = line.strip().split()
+                if len(parts) >= 2:
+                    mac = parts[0] if ":" in parts[0] else ""
+                    name = " ".join(parts[1:]) if len(parts) > 1 else "?"
+                    if mac:
+                        devices.append({"name": name, "address": mac, "rssi": "?"})
+        return devices
