@@ -32,12 +32,7 @@ from rich.text import Text
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from modules.utils import clear_screen, check_dependencies, get_device_info
-from modules.nfc_tools import NfcTools
-from modules.ble_tools import BleTools
-from modules.wifi_tools import WifiTools
 from modules.bruteforce import BruteForce
-from modules.subghz_tools import SubGhzTools
-from modules.badusb_tools import BadUsbTools
 from modules.ir_remote import IrRemote
 from modules.network_remote import NetworkRemote
 from modules.system_tools import SystemTools
@@ -45,18 +40,13 @@ from modules.system_tools import SystemTools
 console = Console()
 
 APP_NAME = "[bold cyan]FLIPPER-Z[/bold cyan] [white]ANDROID[/white]"
-VERSION = "1.1.0"
+VERSION = "2.0.0"
 
 MENU_ITEMS = [
-    {"icon": "📡", "name": "NFC Tools", "desc": "Read, write, clone NFC tags & badges", "color": "cyan"},
-    {"icon": "🔵", "name": "BLE Scanner", "desc": "Bluetooth Low Energy scan & attacks", "color": "blue"},
-    {"icon": "📶", "name": "WiFi Tools", "desc": "Scan, deauth, capture handshake", "color": "green"},
-    {"icon": "⚡", "name": "Brute Force", "desc": "PIN, password, UID brute forcing", "color": "red"},
-    {"icon": "📻", "name": "Sub-GHz", "desc": "RF signal simulation (experimental)", "color": "yellow"},
-    {"icon": "⌨️", "name": "BadUSB", "desc": "HID attack scripts for OTG", "color": "magenta"},
-    {"icon": "📺", "name": "IR Remote", "desc": "TV IR codes (needs IR blaster)", "color": "yellow"},
-    {"icon": "🌐", "name": "Network Remote", "desc": "Smart TV via WiFi (no IR)", "color": "cyan"},
-    {"icon": "🛠️", "name": "System Tools", "desc": "Hydra, John, Nmap, SQLMap, GoBuster...", "color": "magenta"},
+    {"icon": "⚡", "name": "Brute Force", "desc": "Hash, ZIP, PDF, wordlist, PIN analyzer — real tools", "color": "red"},
+    {"icon": "📺", "name": "IR Remote", "desc": "TV IR codes (Samsung, LG, Sony, Panasonic, Xiaomi, TCL)", "color": "yellow"},
+    {"icon": "🌐", "name": "Network Remote", "desc": "Control Smart TV via WiFi (real HTTP)", "color": "cyan"},
+    {"icon": "🛠️", "name": "System Tools", "desc": "Nmap, Hydra, John, SQLMap, GoBuster, FFUF...", "color": "magenta"},
     {"icon": "ℹ️", "name": "Device Info", "desc": "Show phone hardware capabilities", "color": "white"},
     {"icon": "🚪", "name": "Exit", "desc": "Exit Flipper-Z", "color": "red"},
 ]
@@ -70,7 +60,7 @@ def show_banner():
         console.print(f"[cyan]{banner}[/cyan]")
     else:
         console.print(f"[bold cyan]FLIPPER-Z ANDROID v{VERSION}[/bold cyan]")
-    console.print(f"[bold white]┃  Flipper Zero Clone for Termux  ┃[/bold white]")
+    console.print(f"[bold white]┃  Hacking Suite — Only Real Tools  ┃[/bold white]")
     console.print(f"[bold white]┃       v{VERSION}                        ┃[/bold white]")
     console.print("━" * 40, style="cyan")
 
@@ -93,34 +83,9 @@ def show_menu():
     console.print()
 
 
-def handle_nfc():
-    nfc = NfcTools(console)
-    nfc.menu()
-
-
-def handle_ble():
-    ble = BleTools(console)
-    ble.menu()
-
-
-def handle_wifi():
-    wifi = WifiTools(console)
-    wifi.menu()
-
-
 def handle_bruteforce():
     bf = BruteForce(console)
     bf.menu()
-
-
-def handle_subghz():
-    sg = SubGhzTools(console)
-    sg.menu()
-
-
-def handle_badusb():
-    bu = BadUsbTools(console)
-    bu.menu()
 
 
 def handle_ir():
@@ -182,16 +147,11 @@ def main():
                 sys.exit(0)
 
             handlers = {
-                1: handle_nfc,
-                2: handle_ble,
-                3: handle_wifi,
-                4: handle_bruteforce,
-                5: handle_subghz,
-                6: handle_badusb,
-                7: handle_ir,
-                8: handle_network_remote,
-                9: handle_system_tools,
-                10: handle_device_info,
+                1: handle_bruteforce,
+                2: handle_ir,
+                3: handle_network_remote,
+                4: handle_system_tools,
+                5: handle_device_info,
             }
 
             handlers[choice]()

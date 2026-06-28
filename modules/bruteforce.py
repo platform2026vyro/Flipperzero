@@ -27,21 +27,16 @@ class BruteForce:
 
     def menu(self):
         items = [
-            ("1", "NFC/MIFARE UID Brute", "Brute force NFC tag UIDs"),
-            ("2", "BLE PIN Brute Force", "Brute force BLE pairing PIN"),
-            ("3", "WiFi Password Crack", "Wordlist-based WiFi cracking"),
-            ("4", "Multi-Hash Cracker", "MD5/SHA1/SHA256/SHA512/BLAKE2"),
-            ("5", "ZIP Password Cracker", "Unlock password-protected ZIP files"),
-            ("6", "PDF Password Cracker", "Brute force PDF document passwords"),
-            ("7", "Wordlist Generator", "Generate wordlists from personal info"),
-            ("8", "PIN/Code Generator", "Generate PIN & code combinations"),
-            ("9", "Phone Number Gen", "Generate phone number combinations"),
-            ("10", "Combination Engine", "Generate all combinations from charset"),
-            ("11", "Password Analyzer", "Analyze password strength & entropy"),
-            ("12", "Rainbow Table Gen", "Generate rainbow table for hash lookups"),
-            ("13", "Dictionary Attack", "SSH/FTP/HTTP auth brute forcing"),
-            ("14", "Badge UID Generator", "Generate badge UIDs"),
-            ("15", "Barcode/QR Gen", "Generate barcodes & QR codes"),
+            ("1", "Multi-Hash Cracker", "MD5/SHA1/SHA256/SHA512/BLAKE2 — real hashlib"),
+            ("2", "ZIP Password Cracker", "Unlock password-protected ZIP files — real zipfile"),
+            ("3", "PDF Password Cracker", "Brute force PDF document passwords — real pikepdf"),
+            ("4", "Wordlist Generator", "Generate wordlists from personal info"),
+            ("5", "PIN/Code Generator", "Generate PIN & code combinations"),
+            ("6", "Phone Number Gen", "Generate phone number combinations"),
+            ("7", "Combination Engine", "Generate all combinations from charset"),
+            ("8", "Password Analyzer", "Analyze password strength & entropy"),
+            ("9", "Rainbow Table Gen", "Generate rainbow table for hash lookups"),
+            ("10", "Badge UID Generator", "Generate badge UIDs"),
             ("b", "[red]Back[/red]", "Return to main menu"),
         ]
         while True:
@@ -58,89 +53,11 @@ class BruteForce:
             if choice == "b":
                 break
             {
-                "1": self.nfc_uid_brute, "2": self.ble_pin_brute, "3": self.wifi_brute,
-                "4": self.hash_cracker, "5": self.zip_cracker, "6": self.pdf_cracker,
-                "7": self.wordlist_gen, "8": self.pin_generator, "9": self.phone_gen,
-                "10": self.combination_engine, "11": self.password_analyzer,
-                "12": self.rainbow_table, "13": self.dictionary_attack,
-                "14": self.badge_uid_generator, "15": self.barcode_gen,
+                "1": self.hash_cracker, "2": self.zip_cracker, "3": self.pdf_cracker,
+                "4": self.wordlist_gen, "5": self.pin_generator, "6": self.phone_gen,
+                "7": self.combination_engine, "8": self.password_analyzer,
+                "9": self.rainbow_table, "10": self.badge_uid_generator,
             }.get(choice, lambda: self.console.print("[red]Invalid[/red]"))()
-
-    def nfc_uid_brute(self):
-        clear_screen()
-        self._banner()
-        self.console.print("[red]🔓 NFC/MIFARE UID Brute Forcing[/red]\n")
-        uid_start = Prompt.ask("[bold]Start UID (hex)[/bold]", default="00000000")
-        uid_end = Prompt.ask("[bold]End UID (hex)[/bold]", default="00000FFF")
-        s, e, t = int(uid_start, 16), int(uid_end, 16), int(uid_end, 16) - int(uid_start, 16)
-        self.console.print(f"[cyan]Range: {uid_start} - {uid_end} ({t} combos)[/cyan]")
-        self.console.print("[dim]For actual NFC scanning, hold tag near phone[/dim]\n")
-        found = []
-        with Progress() as p:
-            tsk = p.add_task("[red]Generating UIDs...", total=min(t, 1000))
-            for i in range(min(t, 1000)):
-                if i % 100 == 0: found.append(f"{s+i:08X}")
-                p.update(tsk, advance=1)
-                time.sleep(0.001)
-        self.console.print(f"[green]✅ Sample: {', '.join(found[:5])}...[/green]")
-        if Confirm.ask("[yellow]Save UID list?", default=True):
-            path = os.path.join(self.data_dir, f"uids_{uid_start}-{uid_end}.txt")
-            with open(path, "w") as f:
-                for i in range(s, e + 1, max(1, t // 100)):
-                    f.write(f"{i:08X}\n")
-            self.console.print(f"[green]Saved to {path}[/green]")
-        Prompt.ask("[bold yellow]Press Enter[/bold yellow]")
-
-    def ble_pin_brute(self):
-        clear_screen()
-        self._banner()
-        self.console.print("[red]🔓 BLE PIN Brute Force[/red]\n")
-        target = Prompt.ask("[bold]Target BLE MAC", default="")
-        start = int(Prompt.ask("[bold]Start PIN[/bold]", default="000000"))
-        end = int(Prompt.ask("[bold]End PIN[/bold]", default="000500"))
-        self.console.print(f"[cyan]Target: {target or 'Any'} | Range: {start:06d}-{end:06d}[/cyan]")
-        with Progress() as p:
-            tsk = p.add_task("[red]Testing PINs...", total=end - start)
-            for i, pin in enumerate(range(start, end + 1)):
-                p.update(tsk, advance=1)
-                time.sleep(0.005)
-        self.console.print(f"\n[green]✅ Scan complete ({end-start+1} PINs)[/green]")
-        self.console.print("[yellow]Common BLE PINs: 000000, 123456, 111111[/yellow]")
-        if Confirm.ask("[yellow]Save PIN list?", default=True):
-            path = os.path.join(self.data_dir, f"ble_pin_{start:06d}-{end:06d}.txt")
-            with open(path, "w") as f:
-                for p in range(start, end + 1):
-                    f.write(f"{p:06d}\n")
-            self.console.print(f"[green]Saved to {path}[/green]")
-        Prompt.ask("[bold yellow]Press Enter[/bold yellow]")
-
-    def wifi_brute(self):
-        clear_screen()
-        self._banner()
-        self.console.print("[red]🔐 WiFi Password Brute Force[/red]\n")
-        ssid = Prompt.ask("[bold]Target SSID[/bold]")
-        wl = Prompt.ask("[bold]Wordlist path[/bold]", default=os.path.join(self.data_dir, "passwords.txt"))
-        if not os.path.exists(wl):
-            self.console.print("[yellow]Creating sample wordlist...[/yellow]")
-            common = ["password","12345678","admin","wifi","password123","guest","qwerty123",
-                      "letmein","welcome","monkey","dragon","default","wireless","home","router",
-                      "changeme","1234","admin123","passw0rd","P@ssw0rd","test","sumsung","family"]
-            with open(wl, "w") as f: f.write("\n".join(common))
-            self.console.print(f"[green]Created: {wl}[/green]")
-        with open(wl) as f: passwords = [l.strip() for l in f if l.strip()]
-        self.console.print(f"[cyan]SSID: {ssid} | Passwords: {len(passwords)}[/cyan]")
-        if not Confirm.ask("[red]Start?", default=False): return
-        found = None
-        with Progress() as p:
-            tsk = p.add_task("[red]Testing...", total=len(passwords))
-            for i, pwd in enumerate(passwords):
-                p.update(tsk, advance=1)
-                time.sleep(0.02)
-                if pwd in ["password","12345678","admin","wifi","guest","test","family"]:
-                    found = pwd; break
-        if found: self.console.print(f"\n[green]✅ PASSWORD: [bold]{found}[/bold][/green]")
-        else: self.console.print("\n[yellow]❌ Not found. Try larger wordlist.[/yellow]")
-        Prompt.ask("[bold yellow]Press Enter[/bold yellow]")
 
     def hash_cracker(self):
         clear_screen()
@@ -438,32 +355,6 @@ class BruteForce:
         self.console.print(f"[green]✅ Rainbow table saved: {output}[/green]")
         Prompt.ask("[bold yellow]Press Enter[/bold yellow]")
 
-    def dictionary_attack(self):
-        clear_screen()
-        self._banner()
-        self.console.print("[red]📖 Dictionary Attack[/red]\n")
-        target = Prompt.ask("[bold]Target (IP/URL)[/bold]")
-        service = Prompt.ask("[bold]Service[/bold]", choices=["ssh","ftp","http-basic","telnet","custom"], default="ssh")
-        user = Prompt.ask("[bold]Username[/bold]", default="admin")
-        wl = Prompt.ask("[bold]Wordlist[/bold]", default=os.path.join(self.data_dir, "passwords.txt"))
-        if not os.path.exists(wl):
-            common = ["admin","password","12345678","root","admin123","default","passw0rd","letmein","welcome","qwerty"]
-            with open(wl, "w") as f: f.write("\n".join(common))
-            self.console.print(f"[green]Created: {wl}[/green]")
-        with open(wl) as f: passwords = [l.strip() for l in f if l.strip()]
-        self.console.print(f"[cyan]Target: {target} | Service: {service} | User: {user} | {len(passwords)} passwords[/cyan]")
-        if not Confirm.ask("[red]Start?", default=False): return
-        found = None
-        with Progress() as p:
-            tsk = p.add_task("[red]Trying passwords...", total=len(passwords))
-            for pw in passwords:
-                p.update(tsk, advance=1)
-                time.sleep(0.01)
-                if pw in ["admin","password","root","default"]: found = pw; break
-        if found: self.console.print(f"\n[green]✅ FOUND: [bold]{user}:{found}[/bold][/green]")
-        else: self.console.print("\n[yellow]❌ Not found[/yellow]")
-        Prompt.ask("[bold yellow]Press Enter[/bold yellow]")
-
     def badge_uid_generator(self):
         clear_screen()
         self._banner()
@@ -493,26 +384,4 @@ class BruteForce:
             self.console.print(f"[green]Saved {len(uids)} UIDs[/green]")
         Prompt.ask("[bold yellow]Press Enter[/bold yellow]")
 
-    def barcode_gen(self):
-        clear_screen()
-        self._banner()
-        self.console.print("[cyan]📱 QR/Barcode Generator[/cyan]")
-        self.console.print("[yellow]Generate QR codes & barcodes for testing[/yellow]\n")
-        self.console.print("[dim]Using system Python QR tool if available[/dim]\n")
-        qr_script = os.path.join(os.path.dirname(os.path.dirname(__file__)), "..", "qrcode-tool.py")
-        if os.path.exists(qr_script):
-            self.console.print(f"[green]Found QR tool: {qr_script}[/green]")
-        else:
-            qr_script = os.path.join(os.path.dirname(os.path.dirname(__file__)), "qrcode-tool.py")
-            if os.path.exists(qr_script): self.console.print(f"[green]Found QR tool[/green]")
-            else: self.console.print("[yellow]qrcode-tool.py not found in workspace[/yellow]")
-        data = Prompt.ask("[bold]Data to encode[/bold]", default="https://example.com")
-        fmt = Prompt.ask("[bold]Format[/bold]", choices=["qr","barcode","aztec","datamatrix"], default="qr")
-        output = Prompt.ask("[bold]Output file[/bold]", default=os.path.join(self.data_dir, f"code_{int(time.time())}.png"))
-        self.console.print(f"[green]✅ {fmt.upper()} code generated: {output}[/green]")
-        self.console.print(f"[dim]Data: {data}[/dim]")
-        if Confirm.ask("[yellow]Save metadata?", default=True):
-            meta_path = output.replace(".png", ".json")
-            with open(meta_path, "w") as f: json.dump({"data": data, "format": fmt, "output": output}, f)
-            self.console.print(f"[green]Metadata saved[/green]")
-        Prompt.ask("[bold yellow]Press Enter[/bold yellow]")
+ 
