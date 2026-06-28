@@ -6,6 +6,22 @@ Flipper Zero-like tool suite for Android Termux
 
 import sys
 import os
+
+# auto non-interactive when any arg is passed
+NON_INTERACTIVE = len(sys.argv) > 1
+
+if NON_INTERACTIVE:
+    import rich.prompt
+
+    def _mock_ask(prompt="", default="", *a, **kw):
+        return default
+
+    def _mock_confirm(prompt="", default=True, *a, **kw):
+        return default
+
+    rich.prompt.Prompt.ask = _mock_ask
+    rich.prompt.Confirm.ask = _mock_confirm
+
 from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
@@ -142,14 +158,19 @@ def handle_device_info():
 
 def main():
     try:
+        first = True
         while True:
-            show_menu()
-            try:
-                choice = Prompt.ask("[bold yellow]Select option[/bold yellow]", default="11")
-                choice = int(choice)
-            except (ValueError, TypeError):
-                console.print("[red]Invalid selection. Enter a number.[/red]")
-                continue
+            if first and len(sys.argv) > 1 and sys.argv[1].lstrip("-").isdigit():
+                choice = int(sys.argv[1])
+                first = False
+            else:
+                show_menu()
+                try:
+                    choice = Prompt.ask("[bold yellow]Select option[/bold yellow]", default="11")
+                    choice = int(choice)
+                except (ValueError, TypeError):
+                    console.print("[red]Invalid selection. Enter a number.[/red]")
+                    continue
 
             if choice < 1 or choice > len(MENU_ITEMS):
                 console.print("[red]Invalid selection. Try again.[/red]")
@@ -174,6 +195,9 @@ def main():
             }
 
             handlers[choice]()
+
+            if NON_INTERACTIVE:
+                break
     except KeyboardInterrupt:
         clear_screen()
         console.print("[bold cyan]Goodbye! 🐬[/bold cyan]")
