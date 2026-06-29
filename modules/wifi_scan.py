@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """WiFi Scan Module — real scan via termux-wifi-scaninfo"""
 
-import os, json, time, subprocess
+import os, json, time, subprocess, sys
 from rich.table import Table
 from rich.panel import Panel
 from rich.prompt import Prompt, Confirm
@@ -16,7 +16,7 @@ class WifiScan:
         os.makedirs(self.data_dir, exist_ok=True)
 
     def _banner(self):
-        self.console.print(Panel.fit("[bold green]📶 WiFi SCAN[/bold green]\n[white]Real scan via termux-wifi-scaninfo[/white]", border_style="green"))
+        self.console.print(Panel.fit("[bold green][WiFi] WiFi SCAN[/bold green]\n[white]Real scan via termux-wifi-scaninfo[/white]", border_style="green"))
 
     def menu(self):
         while True:
@@ -84,7 +84,7 @@ class WifiScan:
     def ping_sweep(self):
         clear_screen()
         self._banner()
-        self.console.print("[cyan]🌐 LAN Ping Sweep[/cyan]\n")
+        self.console.print("[cyan][NET] LAN Ping Sweep[/cyan]\n")
         subnet = Prompt.ask("[bold]Subnet (e.g. 192.168.1)[/bold]", default="192.168.1")
         start = Prompt.ask("[bold]Start IP[/bold]", default="1")
         end = Prompt.ask("[bold]End IP[/bold]", default="254")
@@ -95,7 +95,11 @@ class WifiScan:
             task = p.add_task("[cyan]Pinging...", total=int(end) - int(start) + 1)
             for i in range(int(start), int(end) + 1):
                 ip = f"{subnet}.{i}"
-                r = subprocess.run(["ping", "-c", "1", "-W", "1", ip], capture_output=True, text=True, timeout=5)
+                # Windows uses different ping flags
+                if sys.platform == "win32":
+                    r = subprocess.run(["ping", "-n", "1", "-w", "1000", ip], capture_output=True, text=True, timeout=5)
+                else:
+                    r = subprocess.run(["ping", "-c", "1", "-W", "1", ip], capture_output=True, text=True, timeout=5)
                 if r.returncode == 0: active.append(ip)
                 p.update(task, advance=1)
         if active:

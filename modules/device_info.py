@@ -15,7 +15,7 @@ class DeviceInfo:
 
     def _banner(self):
         self.console.print(Panel.fit(
-            "[bold green]📱 DEVICE INFO[/bold green]\n"
+            "[bold green][INFO] DEVICE INFO[/bold green]\n"
             "[white]Real device information via termux-api[/white]",
             border_style="green"
         ))
@@ -153,5 +153,5 @@ class DeviceInfo:
         tools = ["nmap", "hydra", "sqlmap", "john", "gobuster", "ffuf", "blesh", "gatttool"]
         for t in tools:
             found = shutil.which(t) is not None
-            self.console.print(f"  {'[green]✅[/green]' if found else '[red]❌[/red]'} {t}")
+            self.console.print(f"  {'[green][OK][/green]' if found else '[red][NO][/red]'} {t}")
         Prompt.ask("[bold yellow]Press Enter[/bold yellow]")

@@ -32,7 +32,7 @@ class NetworkRemote:
 
     def _banner(self):
         self.console.print(Panel.fit(
-            "[bold cyan]🌐 NETWORK REMOTE[/bold cyan]\n"
+            "[bold cyan][NET] NETWORK REMOTE[/bold cyan]\n"
             "[white]Control Smart TVs & Devices via WiFi[/white]",
             border_style="cyan"
         ))
@@ -126,13 +126,13 @@ class NetworkRemote:
             if choice in commands:
                 try:
                     r = requests.get(commands[choice][1], timeout=3)
-                    self.console.print(f"[green]✅ {commands[choice][0]} sent ({r.status_code})[/green]")
+                    self.console.print(f"[green][OK] {commands[choice][0]} sent ({r.status_code})[/green]")
                 except Exception as e:
                     self.console.print(f"[red]Failed: {e}. Trying alternate TCL API...[/red]")
                     alt = f"http://{ip}:8080/remote/{choice}"
                     try:
                         r = requests.get(alt, timeout=3)
-                        self.console.print(f"[green]✅ Sent via alternate API[/green]")
+                        self.console.print(f"[green][OK] Sent via alternate API[/green]")
                     except:
                         self.console.print(f"[yellow]TV not reachable. Make sure TV is on same WiFi network.[/yellow]")
                 Prompt.ask("[bold yellow]Press Enter[/bold yellow]")
@@ -180,7 +180,7 @@ class NetworkRemote:
                 })
                 try:
                     r = requests.post(f"{base_url}/{token}", data=payload, timeout=3)
-                    self.console.print(f"[green]✅ {cmds[choice][0]} sent ({r.status_code})[/green]")
+                    self.console.print(f"[green][OK] {cmds[choice][0]} sent ({r.status_code})[/green]")
                 except Exception as e:
                     self.console.print(f"[yellow]Failed: {e}. TV might need pairing (check screen).[/yellow]")
                     self.console.print("[dim]First time: enter any token, TV will prompt to allow remote[/dim]")
@@ -218,7 +218,7 @@ class NetworkRemote:
             if choice in cmds:
                 try:
                     r = requests.get(cmds[choice][1], timeout=3)
-                    self.console.print(f"[green]✅ {cmds[choice][0]} sent[/green]")
+                    self.console.print(f"[green][OK] {cmds[choice][0]} sent[/green]")
                 except:
                     self.console.print(f"[yellow]LG TV not reachable. Try enabling 'Mobile TV' in settings.[/yellow]")
                 Prompt.ask("[bold yellow]Press Enter[/bold yellow]")
@@ -256,7 +256,7 @@ class NetworkRemote:
             if choice in cmds:
                 try:
                     r = requests.post(cmds[choice][1], data=cmds[choice][2], headers=headers, timeout=3)
-                    self.console.print(f"[green]✅ {cmds[choice][0]} sent ({r.status_code})[/green]")
+                    self.console.print(f"[green][OK] {cmds[choice][0]} sent ({r.status_code})[/green]")
                 except:
                     self.console.print(f"[yellow]Sony TV not reachable. Check IP and PSK.[/yellow]")
                 Prompt.ask("[bold yellow]Press Enter[/bold yellow]")

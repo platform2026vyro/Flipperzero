@@ -19,7 +19,7 @@ class BleScanner:
 
     def _banner(self):
         self.console.print(Panel.fit(
-            "[bold cyan]🔵 BLE SCANNER[/bold cyan]\n"
+            "[bold cyan][BLE] BLE SCANNER[/bold cyan]\n"
             "[white]Bluetooth Low Energy device discovery[/white]",
             border_style="cyan"
         ))

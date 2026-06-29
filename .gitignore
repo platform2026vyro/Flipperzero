@@ -1,5 +1,33 @@
-*.pyc
+# Python
 __pycache__/
-*.tar.gz
-*.deb
+*.py[cod]
+*.egg-info/
+*.egg
+dist/
+build/
+*.whl
 
+# Virtual environment
+venv/
+.env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Project specific
+data/nfc_tags/
+data/ble/
+data/scooter/
+data/ir_codes/
+data/network_remote/
+
+# Logs
+*.log

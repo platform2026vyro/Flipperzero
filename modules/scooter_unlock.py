@@ -27,7 +27,7 @@ class ScooterUnlock:
 
     def _banner(self):
         self.console.print(Panel.fit(
-            "[bold yellow]🛴 SCOOTER BLE UNLOCK[/bold yellow]\n"
+            "[bold yellow][SCO] SCOOTER BLE UNLOCK[/bold yellow]\n"
             "[white]Xiaomi/Ninebot/Kugoo real BLE unlock[/white]",
             border_style="yellow"
         ))
@@ -57,10 +57,10 @@ class ScooterUnlock:
             table.add_row("3", "[yellow]Check Tools[/yellow]", "Check available BLE tools")
             table.add_row("b", "[red]Back[/red]", "")
             self.console.print(table)
-            self.console.print(f"\n[dim]BLE tools: {'✅' if any(tools.values()) else '❌'} "
-                               f"blesh={'✅' if tools['blesh'] else '❌'} "
-                               f"bleak={'✅' if tools['bleak'] else '❌'} "
-                               f"gatttool={'✅' if tools['gatttool'] else '❌'}[/dim]")
+            self.console.print(f"\n[dim]BLE tools: {'[OK]' if any(tools.values()) else '[NO]'} "
+                               f"blesh={'[OK]' if tools['blesh'] else '[NO]'} "
+                               f"bleak={'[OK]' if tools['bleak'] else '[NO]'} "
+                               f"gatttool={'[OK]' if tools['gatttool'] else '[NO]'}[/dim]")
             choice = Prompt.ask("[bold yellow]Select[/bold yellow]", default="b")
             actions = {"1": self.scan_scooters, "2": self.unlock_sequence, "3": self.check_tools}
             actions.get(choice, lambda: None)()
@@ -247,9 +247,9 @@ class ScooterUnlock:
         for cmd_name, hex_cmd in commands:
             r = self._send_command(mac, hex_cmd, cmd_name)
             if r["success"]:
-                self.console.print(f"  [green]✅ {cmd_name}: OK[/green]")
+                self.console.print(f"  [green][OK] {cmd_name}: OK[/green]")
             else:
-                self.console.print(f"  [yellow]⚠️ {cmd_name}: {r.get('error', 'Failed')}[/yellow]")
+                self.console.print(f"  [yellow][!!] {cmd_name}: {r.get('error', 'Failed')}[/yellow]")
 
         self.console.print("\n[cyan]Unlock sequence complete.[/cyan]")
         self.console.print("[dim]Note: Real unlock requires the scooter to be in pairing mode.[/dim]")
@@ -274,7 +274,7 @@ class ScooterUnlock:
             key = {"blesh": "blesh", "gatttool": "gatttool", "bleak (Python)": "bleak",
                    "termux-bluetooth-scan": "termux-bluetooth-scan"}[tool]
             avail = tools.get(key, False)
-            status = "[green]✅[/green]" if avail else "[red]❌[/red]"
+            status = "[green][OK][/green]" if avail else "[red][NO][/red]"
             install = {
                 "blesh": "pkg install blesh",
                 "gatttool": "pkg install bluez",
@@ -285,22 +285,3 @@ class ScooterUnlock:
         self.console.print(table)
         Prompt.ask("[bold yellow]Press Enter[/bold yellow]")
 
-    def _parse_blesh_scan(self, output):
-        devices = []
-        for line in output.split("\n"):
-            parts = line.strip().split()
-            if len(parts) >= 2 and ":" in parts[0]:
-                devices.append({"name": parts[1] if len(parts) > 1 else "?", "address": parts[0], "rssi": "?"})
-        return devices
-
-    def _parse_hcitool_scan(self, output):
-        devices = []
-        for line in output.split("\n"):
-            if ":" in line and len(line) > 20:
-                parts = line.strip().split()
-                if len(parts) >= 2:
-                    mac = parts[0] if ":" in parts[0] else ""
-                    name = " ".join(parts[1:]) if len(parts) > 1 else "?"
-                    if mac:
-                        devices.append({"name": name, "address": mac, "rssi": "?"})
-        return devices

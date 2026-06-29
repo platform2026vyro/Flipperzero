@@ -20,7 +20,7 @@ class BruteForce:
 
     def _banner(self):
         self.console.print(Panel.fit(
-            "[bold red]⚡ BRUTE FORCE ENGINE v2[/bold red]\n"
+            "[bold red][BFC] BRUTE FORCE ENGINE v2[/bold red]\n"
             "[white]Complete hacking toolkit — PIN, Hash, ZIP, PDF, Wordlist & more[/white]",
             border_style="red"
         ))
@@ -62,7 +62,7 @@ class BruteForce:
     def hash_cracker(self):
         clear_screen()
         self._banner()
-        self.console.print("[cyan]🔑 Multi-Hash Cracker[/cyan]\n")
+        self.console.print("[cyan][KEY] Multi-Hash Cracker[/cyan]\n")
         ht = Prompt.ask("Hash type", choices=["md5","sha1","sha224","sha256","sha384","sha512","blake2b","auto"], default="auto")
         hv = Prompt.ask("[bold]Hash[/bold]")
         wl = Prompt.ask("[bold]Wordlist[/bold]", default=os.path.join(self.data_dir, "passwords.txt"))
@@ -85,18 +85,18 @@ class BruteForce:
                 if h == hv.lower(): found = w; break
                 p.update(tsk, advance=1)
         if found:
-            self.console.print(f"\n[green]✅ CRACKED: [bold]{found}[/bold][/green]")
+            self.console.print(f"\n[green][OK] CRACKED: [bold]{found}[/bold][/green]")
             if Confirm.ask("[yellow]Save?", default=True):
                 path = os.path.join(self.data_dir, "cracked_hashes.txt")
                 with open(path, "a") as f: f.write(f"{ht}:{hv} -> {found}\n")
                 self.console.print(f"[green]Saved[/green]")
-        else: self.console.print("\n[yellow]❌ Not cracked[/yellow]")
+        else: self.console.print("\n[yellow][NO] Not cracked[/yellow]")
         Prompt.ask("[bold yellow]Press Enter[/bold yellow]")
 
     def zip_cracker(self):
         clear_screen()
         self._banner()
-        self.console.print("[red]🗜️ ZIP Password Cracker[/red]\n")
+        self.console.print("[red][ZIP] ZIP Password Cracker[/red]\n")
         zpath = Prompt.ask("[bold]ZIP file path[/bold]")
         if not os.path.exists(zpath): self.console.print("[red]File not found[/red]"); Prompt.ask("[bold yellow]Press Enter[/bold yellow]"); return
         try: zf = zipfile.ZipFile(zpath); zf.testzip(); zf.close()
@@ -118,14 +118,14 @@ class BruteForce:
                     zf.close(); found = pw; break
                 except: pass
                 p.update(tsk, advance=1)
-        if found: self.console.print(f"\n[green]✅ ZIP CRACKED: [bold]{found}[/bold][/green]")
-        else: self.console.print("\n[yellow]❌ Password not found[/yellow]")
+        if found: self.console.print(f"\n[green][OK] ZIP CRACKED: [bold]{found}[/bold][/green]")
+        else: self.console.print("\n[yellow][NO] Password not found[/yellow]")
         Prompt.ask("[bold yellow]Press Enter[/bold yellow]")
 
     def pdf_cracker(self):
         clear_screen()
         self._banner()
-        self.console.print("[red]📄 PDF Password Cracker[/red]\n")
+        self.console.print("[red][PDF] PDF Password Cracker[/red]\n")
         ppath = Prompt.ask("[bold]PDF file path[/bold]")
         if not os.path.exists(ppath): self.console.print("[red]Not found[/red]"); Prompt.ask("[bold yellow]Press Enter[/bold yellow]"); return
         wl = Prompt.ask("[bold]Wordlist[/bold]", default=os.path.join(self.data_dir, "passwords.txt"))
@@ -147,8 +147,8 @@ class BruteForce:
                         found = pw; break
                     except: pass
                     p.update(tsk, advance=1)
-            if found: self.console.print(f"\n[green]✅ PDF CRACKED: [bold]{found}[/bold][/green]")
-            else: self.console.print("\n[yellow]❌ Not found[/yellow]")
+            if found: self.console.print(f"\n[green][OK] PDF CRACKED: [bold]{found}[/bold][/green]")
+            else: self.console.print("\n[yellow][NO] Not found[/yellow]")
         except ImportError:
             self.console.print("[yellow]pikepdf not installed. Try: pip install pikepdf[/yellow]")
             self.console.print("[dim]Or use a wordlist-based approach manually[/dim]")
@@ -157,7 +157,7 @@ class BruteForce:
     def wordlist_gen(self):
         clear_screen()
         self._banner()
-        self.console.print("[cyan]📝 Wordlist Generator[/cyan]")
+        self.console.print("[cyan][DOC] Wordlist Generator[/cyan]")
         self.console.print("[yellow]Generate password wordlists from personal info[/yellow]\n")
         first = Prompt.ask("[bold]First name[/bold]", default="")
         last = Prompt.ask("[bold]Last name[/bold]", default="")
@@ -202,7 +202,7 @@ class BruteForce:
     def pin_generator(self):
         clear_screen()
         self._banner()
-        self.console.print("[cyan]🔢 PIN/Code Generator[/cyan]\n")
+        self.console.print("[cyan][PIN] PIN/Code Generator[/cyan]\n")
         digits = int(Prompt.ask("[bold]Digits[/bold]", default="4"))
         count = int(Prompt.ask("[bold]Count[/bold]", default="100"))
         inc_seq = Confirm.ask("[yellow]Include sequential (1234, 4321)?", default=True)
@@ -235,7 +235,7 @@ class BruteForce:
     def phone_gen(self):
         clear_screen()
         self._banner()
-        self.console.print("[cyan]📱 Phone Number Generator[/cyan]\n")
+        self.console.print("[cyan][INFO] Phone Number Generator[/cyan]\n")
         country = Prompt.ask("[bold]Country code[/bold]", default="39")
         prefix = Prompt.ask("[bold]Prefix[/bold]", default="3")
         digits = 10 - len(country) if country.startswith("+") else 10
@@ -290,7 +290,7 @@ class BruteForce:
     def password_analyzer(self):
         clear_screen()
         self._banner()
-        self.console.print("[cyan]🔐 Password Strength Analyzer[/cyan]\n")
+        self.console.print("[cyan][LOCK] Password Strength Analyzer[/cyan]\n")
         pw = Prompt.ask("[bold]Enter password to analyze[/bold]")
         if not pw: return
         length = len(pw)
@@ -312,17 +312,17 @@ class BruteForce:
         table = Table(title="Password Analysis", box=box.ROUNDED, border_style="cyan")
         table.add_column("Property", style="bold"); table.add_column("Value")
         table.add_row("Length", str(length))
-        table.add_row("Lowercase", "✅" if has_lower else "❌")
-        table.add_row("Uppercase", "✅" if has_upper else "❌")
-        table.add_row("Digits", "✅" if has_digit else "❌")
-        table.add_row("Special Chars", "✅" if has_special else "❌")
+        table.add_row("Lowercase", "[OK]" if has_lower else "[NO]")
+        table.add_row("Uppercase", "[OK]" if has_upper else "[NO]")
+        table.add_row("Digits", "[OK]" if has_digit else "[NO]")
+        table.add_row("Special Chars", "[OK]" if has_special else "[NO]")
         table.add_row("Charset Size", str(charset_size))
         table.add_row("Entropy", f"{entropy:.1f} bits")
-        if entropy < 30: strength = "[red]Very Weak ❌[/red]"
-        elif entropy < 50: strength = "[yellow]Weak ⚠️[/yellow]"
-        elif entropy < 70: strength = "[yellow]Moderate 👌[/yellow]"
-        elif entropy < 100: strength = "[green]Strong ✅[/green]"
-        else: strength = "[bold green]Very Strong 🏆[/bold green]"
+        if entropy < 30: strength = "[red]Very Weak [NO][/red]"
+        elif entropy < 50: strength = "[yellow]Weak [!!][/yellow]"
+        elif entropy < 70: strength = "[yellow]Moderate [OK][/yellow]"
+        elif entropy < 100: strength = "[green]Strong [OK][/green]"
+        else: strength = "[bold green]Very Strong [TROPHY][/bold green]"
         table.add_row("Strength", strength)
         self.console.print(table)
         if Confirm.ask("[yellow]Save analysis?", default=False):
@@ -334,7 +334,7 @@ class BruteForce:
     def rainbow_table(self):
         clear_screen()
         self._banner()
-        self.console.print("[cyan]🌈 Rainbow Table Generator[/cyan]\n")
+        self.console.print("[cyan][RAIN] Rainbow Table Generator[/cyan]\n")
         ht = Prompt.ask("Hash type", choices=["md5","sha1","sha256"], default="md5")
         wl = Prompt.ask("[bold]Wordlist source[/bold]", default=os.path.join(self.data_dir, "passwords.txt"))
         if not os.path.exists(wl):
@@ -352,13 +352,13 @@ class BruteForce:
                     h = hashlib.new(ht, w.encode()).hexdigest()
                     out.write(f"{h}:{w}\n")
                     p.update(tsk, advance=1)
-        self.console.print(f"[green]✅ Rainbow table saved: {output}[/green]")
+        self.console.print(f"[green][OK] Rainbow table saved: {output}[/green]")
         Prompt.ask("[bold yellow]Press Enter[/bold yellow]")
 
     def badge_uid_generator(self):
         clear_screen()
         self._banner()
-        self.console.print("[cyan]🎴 Badge UID Generator[/cyan]\n")
+        self.console.print("[cyan][BADG] Badge UID Generator[/cyan]\n")
         fmt = Prompt.ask("[bold]Format[/bold]", choices=["4-byte (MIFARE)","7-byte (MIFARE UL)","10-byte (DESFire)"], default="4-byte (MIFARE)")
         bc = {"4-byte (MIFARE)": 4, "7-byte (MIFARE UL)": 7, "10-byte (DESFire)": 10}[fmt]
         prefix = Prompt.ask("[bold]UID prefix (hex)[/bold]", default="").replace(" ", "").upper()

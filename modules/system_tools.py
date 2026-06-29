@@ -113,7 +113,7 @@ class SystemTools:
 
     def _banner(self):
         self.console.print(Panel.fit(
-            "[bold magenta]🛠️ SYSTEM TOOLS[/bold magenta]\n"
+            "[bold magenta][TOOL] SYSTEM TOOLS[/bold magenta]\n"
             "[white]Launch installed brute force & hacking tools from Flipper-Z[/white]",
             border_style="magenta"
         ))
@@ -151,15 +151,15 @@ class SystemTools:
             table.add_column("Description", style="white", width=42)
             table.add_row("", "[bold cyan]── BRUTE FORCE TOOLS ──[/bold cyan]", "")
             for i, (k, v) in enumerate(list(TOOLS.items())[:5], 1):
-                status = "✅" if self._is_installed(v["check"].split()[1]) else "❌"
+                status = "[OK]" if self._is_installed(v["check"].split()[1]) else "[NO]"
                 table.add_row(str(i), f"{status} {v['name']}", v["desc"])
             table.add_row("", "[bold cyan]── WEB SCANNERS ──[/bold cyan]", "")
             for i, (k, v) in enumerate(list(TOOLS.items())[5:], 6):
-                status = "✅" if self._is_installed(v["check"].split()[1]) else "❌"
+                status = "[OK]" if self._is_installed(v["check"].split()[1]) else "[NO]"
                 table.add_row(str(i), f"{status} {v['name']}", v["desc"])
             table.add_row("", "[bold cyan]── DOMAIN/RECON TOOLS ──[/bold cyan]", "")
             for i, (k, v) in enumerate(list(DOMAIN_TOOLS.items()), 11):
-                status = "✅" if self._is_installed(k) else "❌"
+                status = "[OK]" if self._is_installed(k) else "[NO]"
                 table.add_row(str(i), f"{status} {v['name']}", v["desc"])
             table.add_row("c", "[yellow]Custom Command[/yellow]", "Run any shell command")
             table.add_row("b", "[red]Back[/red]", "")
@@ -176,7 +176,7 @@ class SystemTools:
                 continue
             key, tool = tool_map[choice]
             if not self._is_installed(key):
-                self.console.print(f"[red]❌ {tool['name']} not installed![/red]")
+                self.console.print(f"[red][NO] {tool['name']} not installed![/red]")
                 self.console.print(f"[yellow]Install: pkg install {key}[/yellow]")
                 Prompt.ask("[bold yellow]Press Enter[/bold yellow]")
                 continue

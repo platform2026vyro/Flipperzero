@@ -64,7 +64,7 @@ class IrRemote:
 
     def _banner(self):
         self.console.print(Panel.fit(
-            "[bold yellow]📺 IR REMOTE[/bold yellow]\n"
+            "[bold yellow][IR] IR REMOTE[/bold yellow]\n"
             "[white]TV & Appliance Infrared Remote Codes[/white]",
             border_style="yellow"
         ))
@@ -134,7 +134,7 @@ class IrRemote:
             table.add_column("Command")
             table.add_column("IR Ready")
             for i, cmd in enumerate(commands, 1):
-                has_code = "✅" if cmd in data else "❌"
+                has_code = "[OK]" if cmd in data else "[NO]"
                 table.add_row(str(i), cmd.replace("_", " ").title(), has_code)
             table.add_row("8", "[red]Back[/red]", "")
             self.console.print(table)
@@ -148,7 +148,7 @@ class IrRemote:
                     self.console.print(f"[yellow]Sending {data['name']} → {cmd}...[/yellow]")
                     ok = self._transmit(data["freq"], data[cmd])
                     if ok:
-                        self.console.print("[green]✅ Signal sent![/green]")
+                        self.console.print("[green][OK] Signal sent![/green]")
                     else:
                         self.console.print("[yellow]No IR hardware detected. Code displayed below.[/yellow]")
                         self.console.print(Panel(
@@ -174,7 +174,7 @@ class IrRemote:
             return
         ok = self._transmit(freq_int, pattern)
         if ok:
-            self.console.print("[green]✅ Custom signal sent![/green]")
+            self.console.print("[green][OK] Custom signal sent![/green]")
         else:
             self.console.print("[yellow]No IR hardware. Pattern noted.[/yellow]")
         Prompt.ask("[bold yellow]Press Enter[/bold yellow]")
@@ -185,9 +185,9 @@ class IrRemote:
         self.console.print("[cyan]Testing IR hardware...[/cyan]\n")
         result = run_termux_command(["termux-infrared-transmit", "--help"])
         if result["success"]:
-            self.console.print("[green]✅ IR blaster available! (termux-infrared-transmit detected)[/green]")
+            self.console.print("[green][OK] IR blaster available! (termux-infrared-transmit detected)[/green]")
         else:
-            self.console.print("[yellow]❌ No IR blaster detected[/yellow]")
+            self.console.print("[yellow][NO] No IR blaster detected[/yellow]")
             self.console.print("[dim]Your phone needs an IR transmitter (Xiaomi, Huawei, some Samsung)[/dim]")
             self.console.print("[dim]Install: pkg install termux-api[/dim]")
         Prompt.ask("[bold yellow]Press Enter[/bold yellow]")

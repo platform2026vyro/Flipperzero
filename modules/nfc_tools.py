@@ -19,7 +19,7 @@ class NfcTools:
 
     def _banner(self):
         self.console.print(Panel.fit(
-            "[bold blue]📡 NFC TOOLS[/bold blue]\n"
+            "[bold blue][NFC] NFC TOOLS[/bold blue]\n"
             "[white]Read NFC tags via termux-nfc[/white]",
             border_style="blue"
         ))
@@ -82,7 +82,7 @@ class NfcTools:
             data = json.loads(result.stdout)
         except json.JSONDecodeError:
             data = {"raw_output": result.stdout.strip()}
-        self.console.print("[green]✅ Tag detected![/green]")
+        self.console.print("[green][OK] Tag detected![/green]")
         table = Table(box=box.ROUNDED, border_style="blue")
         table.add_column("Field", style="bold")
         table.add_column("Value")
@@ -101,9 +101,9 @@ class NfcTools:
         self._banner()
         available = self._check_nfc()
         if available:
-            self.console.print("[green]✅ NFC hardware appears available[/green]")
+            self.console.print("[green][OK] NFC hardware appears available[/green]")
         else:
-            self.console.print("[red]❌ NFC hardware not detected[/red]")
+            self.console.print("[red][NO] NFC hardware not detected[/red]")
             self.console.print("[yellow]Check: pkg install termux-api && enable NFC in settings[/yellow]")
         Prompt.ask("[bold yellow]Press Enter[/bold yellow]")
 
